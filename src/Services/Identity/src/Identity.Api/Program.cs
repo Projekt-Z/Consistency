@@ -1,7 +1,7 @@
-using Identity.Api.Application;
-using Identity.Api.Domain;
-using Identity.Api.Domain.DTOs;
-using Identity.Api.Domain.Models;
+using Identity.Application;
+using Identity.Domain;
+using Identity.Domain.DTOs;
+using Identity.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

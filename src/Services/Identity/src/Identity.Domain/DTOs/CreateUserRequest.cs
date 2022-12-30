@@ -1,4 +1,4 @@
-﻿namespace Identity.Api.Domain.DTOs;
+﻿namespace Identity.Domain.DTOs;
 
 public class CreateUserRequest
 {

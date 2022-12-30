@@ -1,7 +1,7 @@
-﻿using Identity.Api.Domain.DTOs;
-using Identity.Api.Domain.Models;
+﻿using Identity.Api.Domain.Models;
+using Identity.Domain.DTOs;
 
-namespace Identity.Api.Application;
+namespace Identity.Application;
 
 public interface IUserRepository
 {

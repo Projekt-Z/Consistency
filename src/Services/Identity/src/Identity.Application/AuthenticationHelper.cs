@@ -3,9 +3,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Identity.Api.Domain.Models;
+using Identity.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Identity.Api.Application;
+namespace Identity.Application;
 
 public static class AuthenticationHelper
 {

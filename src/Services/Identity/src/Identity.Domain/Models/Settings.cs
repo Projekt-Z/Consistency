@@ -1,4 +1,4 @@
-﻿namespace Identity.Api.Domain.Models;
+﻿namespace Identity.Domain.Models;
 
 public class Settings
 {

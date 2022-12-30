@@ -1,9 +1,9 @@
-﻿using Identity.Api.Domain;
-using Identity.Api.Domain.DTOs;
-using Identity.Api.Domain.Models;
+﻿using Identity.Api.Domain.Models;
+using Identity.Domain;
+using Identity.Domain.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Api.Application;
+namespace Identity.Application;
 
 public class UserRepository : IUserRepository
 {

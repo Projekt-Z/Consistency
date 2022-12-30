@@ -1,7 +1,7 @@
 ﻿using Identity.Api.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Api.Domain;
+namespace Identity.Domain;
 
 public class ApplicationContext : DbContext
 {
