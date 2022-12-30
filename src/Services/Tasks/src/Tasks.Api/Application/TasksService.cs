@@ -1,15 +1,19 @@
-﻿using Tasks.Api.Domain;
+﻿using MongoDB.Driver;
+using Tasks.Api.Domain;
 
 namespace Tasks.Api.Application;
 
 public class TasksService : ITasksService
 {
-    public TasksService()
+    private readonly IMongoCollection<TaskModel> _tasks;
+    public TasksService(WebApplicationBuilder app)
     {
-        Tasks = new();
+        var connectionString = app.Configuration.GetConnectionString("mongodb");
+        //var mongoUrl = MongoUrl.Create(connectionString);
+        var mongoClient = new MongoClient(connectionString);
+        var db = mongoClient.GetDatabase("ctaskdb");
+        _tasks = db.GetCollection<TaskModel>("tasks");
     }
-
-    public List<TaskModel> Tasks { get; set; }
     
     public TaskModel Add(CreateTaskModelRequest request, out Guid taskId)
     {
@@ -17,62 +21,67 @@ public class TasksService : ITasksService
 
         var task = new TaskModel
         {
-            Id = taskId,
             Content = request.Content,
             CreatedAt = DateTime.Now,
             Finished = false,
             OwnerId = request.OwnerId
         };
-        
-        Tasks.Add(task);
+
+        _tasks.InsertOneAsync(task);
 
         return task;
     }
 
-    public TaskModel? Get(Guid id)
+    public async Task<TaskModel?> Get(string id)
     {
-        return Tasks.FirstOrDefault(x => x.Id == id);
+        var definition = Builders<TaskModel>.Filter.Eq(x => x.Id, id);
+        return await _tasks.Find(definition).SingleOrDefaultAsync();
     }
 
-    public List<TaskModel> GetAll()
+    public Task<List<TaskModel>> GetAll()
     {
-        return Tasks;
+        return _tasks.Find(Builders<TaskModel>.Filter.Empty).ToListAsync();
     }
 
-    public bool Delete(Guid taskId, Guid ownerId)
+    public async Task<List<TaskModel>> GetAllForUser(Guid ownerId)
     {
-        var task = Tasks.FirstOrDefault(x => x.Id == taskId);
+        var definition = Builders<TaskModel>.Filter.Eq(x => x.OwnerId, ownerId);
+        return await _tasks.Find(definition).ToListAsync();
+    }
 
-        if (task is null) return false;
+    public async Task<bool> Delete(string taskId, Guid ownerId)
+    {
+        var definition = Builders<TaskModel>.Filter.Eq(x => x.Id, taskId);
+        var task = _tasks.Find(definition).SingleOrDefaultAsync();
 
-        if (task.OwnerId != ownerId) return false;
+        if (task.Result is null) return false;
+
+        if (task.Result.OwnerId != ownerId) return false;
         
-        var index = Tasks.IndexOf(task);
-        Tasks.RemoveAt(index);
+        await _tasks.DeleteOneAsync(definition);
+
         return true;
     }
 
-    public bool Update(Guid taskId, CreateTaskModelRequest request)
+    public async Task<bool> Update(string taskId, CreateTaskModelRequest request)
     {
-        var task = Tasks.FirstOrDefault(x => x.Id == taskId);
+        var definition = Builders<TaskModel>.Filter.Eq(x => x.Id, taskId);
+        var task = _tasks.Find(definition).SingleOrDefaultAsync();
 
-        if (task is null) return false;
-        
-        if (task.OwnerId != request.OwnerId) return false;
-        
-        var index = Tasks.IndexOf(task);
-        Tasks.RemoveAt(index);
-        
-        Tasks.Add(new TaskModel
+        if (task.Result is null) return false;
+
+        if (task.Result.OwnerId != request.OwnerId) return false;
+
+        await _tasks.ReplaceOneAsync(definition, new TaskModel
         {
             Id = taskId,
             Content = request.Content,
-            CreatedAt = task.CreatedAt,
+            CreatedAt = task.Result.CreatedAt,
+            Finished = task.Result.Finished,
             LastEdited = DateTime.Now,
-            Finished = task.Finished,
             OwnerId = request.OwnerId
         });
-
+        
         return true;
     }
 }
