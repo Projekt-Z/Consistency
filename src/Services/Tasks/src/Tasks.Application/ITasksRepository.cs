@@ -1,8 +1,8 @@
-﻿using Tasks.Api.Domain;
+﻿using Tasks.Domain;
 
-namespace Tasks.Api.Application;
+namespace Tasks.Application;
 
-public interface ITasksService
+public interface ITasksRepository
 {
     TaskModel Add(CreateTaskModelRequest request, out Guid taskId);
     Task<TaskModel?> Get(string id);

@@ -1,10 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
-using Tasks.Api.Application;
-using Tasks.Api.Domain;
+using MongoDB.Driver;
+using Tasks.Application;
+using Tasks.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
-var taskService = new TasksService(builder);
+
 var app = builder.Build();
+
+var connectionString = app.Configuration.GetConnectionString("mongodb");
+//var mongoUrl = MongoUrl.Create(connectionString);
+var mongoClient = new MongoClient(connectionString);
+var db = mongoClient.GetDatabase("ctaskdb");
+
+var taskService = new TasksRepository(db);
 
 if(app.Environment.IsDevelopment())
     app.MapGet("/", () => taskService.GetAll());

@@ -1,4 +1,4 @@
-﻿namespace Tasks.Api.Domain;
+﻿namespace Tasks.Domain;
 
 public class CreateTaskModelRequest
 {

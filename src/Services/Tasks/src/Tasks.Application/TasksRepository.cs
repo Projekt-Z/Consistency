@@ -1,17 +1,13 @@
 ﻿using MongoDB.Driver;
-using Tasks.Api.Domain;
+using Tasks.Domain;
 
-namespace Tasks.Api.Application;
+namespace Tasks.Application;
 
-public class TasksService : ITasksService
+public class TasksRepository : ITasksRepository
 {
     private readonly IMongoCollection<TaskModel> _tasks;
-    public TasksService(WebApplicationBuilder app)
+    public TasksRepository(IMongoDatabase db)
     {
-        var connectionString = app.Configuration.GetConnectionString("mongodb");
-        //var mongoUrl = MongoUrl.Create(connectionString);
-        var mongoClient = new MongoClient(connectionString);
-        var db = mongoClient.GetDatabase("ctaskdb");
         _tasks = db.GetCollection<TaskModel>("tasks");
     }
     
