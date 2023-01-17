@@ -15,19 +15,19 @@ var db = mongoClient.GetDatabase("ctaskdb");
 var taskService = new TasksRepository(db);
 
 if(app.Environment.IsDevelopment())
-    app.MapGet("/", () => taskService.GetAll());
+    app.MapGet("/tasks", () => taskService.GetAll());
 
-app.MapGet("/{id}", (string id) => taskService.Get(id));
-app.MapGet("/all/{id}", (Guid id) => taskService.GetAllForUser(id));
+app.MapGet("/tasks/{id}", (string id) => taskService.Get(id));
+app.MapGet("/tasks/all/{id}", (Guid id) => taskService.GetAllForUser(id));
 
-app.MapPut("/", (CreateTaskModelRequest request) =>
+app.MapPut("/tasks", (CreateTaskModelRequest request) =>
 {
     var task = taskService.Add(request, out var id);
-    return Results.Created($"/{id}", task);
+    return Results.Created($"/tasks/{id}", task);
 });
 
-app.MapDelete("/{id}", (string id, [FromBody] DeleteTaskModelRequest request) => taskService.Delete(id, request.OwnerId));
-app.MapPost("/{id}", (string id, [FromBody] CreateTaskModelRequest request) =>
+app.MapDelete("/tasks/{id}", (string id, [FromBody] DeleteTaskModelRequest request) => taskService.Delete(id, request.OwnerId));
+app.MapPost("/tasks/{id}", (string id, [FromBody] CreateTaskModelRequest request) =>
 {
     var success = taskService.Update(id, request);
 

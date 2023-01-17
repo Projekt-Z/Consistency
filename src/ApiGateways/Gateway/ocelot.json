@@ -1,10 +1,46 @@
 ﻿{
   "Routes": [
     {
+      "UpstreamPathTemplate": "/auth",
+      "UpstreamHttpMethod": ["Get", "Post", "Put"],
       
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5141
+        }
+      ],
+      "DownstreamPathTemplate": "/auth"
+    },
+    {
+      "UpstreamPathTemplate": "/tasks/{id}",
+      "UpstreamHttpMethod": ["Get", "Post", "Delete"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5243
+        }
+      ],
+      "DownstreamPathTemplate": "/tasks/{id}"
+    },
+    {
+      "UpstreamPathTemplate": "/tasks",
+      "UpstreamHttpMethod": ["Get", "Put"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5243
+        }
+      ],
+      "DownstreamPathTemplate": "/tasks"
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:8001"
+    "BaseUrl": "http://localhost:5053"
   }
 }

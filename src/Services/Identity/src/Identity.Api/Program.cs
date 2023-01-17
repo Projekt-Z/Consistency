@@ -22,7 +22,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapGet("/", ([FromServices] IUserRepository userRepo) => userRepo.GetAll());
+    app.MapGet("/auth", ([FromServices] IUserRepository userRepo) => userRepo.GetAll());
 }
 
 app.MapPut("/auth", (CreateUserRequest request, [FromServices] IUserRepository userRepo) =>
@@ -30,7 +30,7 @@ app.MapPut("/auth", (CreateUserRequest request, [FromServices] IUserRepository u
     userRepo.Add(request);
 });
 
-app.MapPost("/auth", (LoginUserRequest request, [FromServices] Settings settings, [FromServices] ApplicationContext db) =>
+app.MapPost("/auth", (LoginUserRequest request, [FromServices] ApplicationContext db) =>
 {
     var user = db.Users.SingleOrDefault(x => x.Username == request.Username);
 
