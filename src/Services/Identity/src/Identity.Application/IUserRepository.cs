@@ -6,7 +6,7 @@ namespace Identity.Application;
 public interface IUserRepository
 {
     Task<(bool, object)> Add(CreateUserRequest request);
-    User Get();
+    User? Get(Guid id);
     Task<List<User>> GetAll();
     bool Delete();
 }

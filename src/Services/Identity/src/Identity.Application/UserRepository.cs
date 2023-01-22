@@ -14,7 +14,7 @@ public class UserRepository : IUserRepository
         _context = context;
     }
     
-    public async Task<(bool, object)>  Add(CreateUserRequest request)
+    public async Task<(bool, object)> Add(CreateUserRequest request)
     {
         var user = new User
         {
@@ -26,7 +26,7 @@ public class UserRepository : IUserRepository
         
         user.ProvideSaltAndHash();
         
-        // TODO: Check if user exists, if yes => return false
+        if (Get(request.Username) is not null) return (false, new { Message = "User with this username already exists." });
         
         await _context.Users.AddAsync(user);
 
@@ -35,11 +35,16 @@ public class UserRepository : IUserRepository
         return (true, user);
     }
 
-    public User Get()
+    public User? Get(Guid id)
     {
-        throw new NotImplementedException();
+        return _context.Users.FirstOrDefault(x => x.Id == id);
     }
 
+    private User? Get(string username)
+    {
+        return _context.Users.FirstOrDefault(x => x.Username == username);
+    }
+    
     public Task<List<User>> GetAll()
     {
         return _context.Users.ToListAsync();

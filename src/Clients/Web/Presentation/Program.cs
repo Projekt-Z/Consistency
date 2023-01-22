@@ -1,4 +1,6 @@
 using Application;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Presentation.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,11 @@ builder.Services.AddHttpClient<ITasksRepository, TasksRepository>(c =>
 });
 
 builder.Services.AddHttpClient();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie();
 
 var app = builder.Build();
 

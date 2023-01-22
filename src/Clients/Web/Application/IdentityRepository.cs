@@ -42,11 +42,33 @@ public class IdentityRepository : IIdentityRepository
             //content = JsonConvert.DeserializeObject<User>(responseBody);
             return (true, string.Empty);
         }
-        else
-        {
-            content = JsonConvert.DeserializeObject<MessageResponseDto>(responseBody);
-            return (false, content.ToString());
-        }
+
+        content = JsonConvert.DeserializeObject<MessageResponseDto>(responseBody);
+        return (false, content.ToString());
+    }
+
+    public async Task<(bool, object)> LoginUser(SignInRequestDto userDto)
+    {
+        var serializedUser = JsonConvert.SerializeObject(userDto);
         
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress + "auth");
+        requestMessage.Content = new StringContent(serializedUser);
+        requestMessage.Content.Headers.ContentType
+            = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        
+        var response = await _httpClient.SendAsync(requestMessage);
+        
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        object? content;
+        
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            content = JsonConvert.DeserializeObject<SignInResponseDto>(responseBody);
+            return (true, content);
+        }
+
+        content = JsonConvert.DeserializeObject<MessageResponseDto>(responseBody);
+        return (false, content.ToString());
     }
 }

@@ -21,7 +21,7 @@
 <div class="col-12 row">
     <span class="col-12"></span>
     <input type="submit" class="form-control col-6 btn btn-primary" value="Sign up" />
-    <a href="/" class="col-6">Already an user?</a>
+    <a href="/sign-in" class="col-6">Already have an accont?</a>
 </div>
 <br />
 <div class="col-12 row" style="text-align:left; font-weight:bold">
@@ -51,7 +51,7 @@
             return false;
         }
         
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/sign-in");
         return await Task.FromResult(true);
     }
 }

@@ -32,7 +32,7 @@ app.MapPut("/auth", async (CreateUserRequest request, [FromServices] IUserReposi
 
     await success;
 
-    if (!success.Result.Item1) return Results.BadRequest();
+    if (!success.Result.Item1) return Results.BadRequest(success.Result.Item2);
     
     var usr = success.Result.Item2 as User;
     return Results.Created($"/auth/{usr!.Id}", null);
