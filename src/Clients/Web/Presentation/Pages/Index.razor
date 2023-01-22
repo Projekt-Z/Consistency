@@ -1,9 +1,13 @@
 ﻿@page "/"
+@using Application
+@inject IIdentityRepository _identityRepository
+@inject ITasksRepository _tasksRepository
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello!</h1>
+<h1>Hello, world!</h1>
 
-Welcome to your Consistency App. We will make you be more consistent with your tasks.
+Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?"/>
+

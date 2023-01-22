@@ -1,3 +1,4 @@
+using Identity.Api.Domain.Models;
 using Identity.Application;
 using Identity.Domain;
 using Identity.Domain.DTOs;
@@ -25,9 +26,16 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/auth", ([FromServices] IUserRepository userRepo) => userRepo.GetAll());
 }
 
-app.MapPut("/auth", (CreateUserRequest request, [FromServices] IUserRepository userRepo) =>
+app.MapPut("/auth", async (CreateUserRequest request, [FromServices] IUserRepository userRepo) =>
 {
-    userRepo.Add(request);
+    var success = userRepo.Add(request);
+
+    await success;
+
+    if (!success.Result.Item1) return Results.BadRequest();
+    
+    var usr = success.Result.Item2 as User;
+    return Results.Created($"/auth/{usr!.Id}", null);
 });
 
 app.MapPost("/auth", (LoginUserRequest request, [FromServices] ApplicationContext db) =>

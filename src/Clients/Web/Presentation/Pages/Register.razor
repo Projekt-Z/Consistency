@@ -1,0 +1,57 @@
+﻿@page "/sign-up"
+
+@using Application
+@using Domain.DTOs
+@using Task = System.Threading.Tasks.Task
+
+@inject IIdentityRepository IdentityRepository
+@inject NavigationManager NavigationManager
+
+<h3>Create new account</h3>
+
+<EditForm Model="@User" OnValidSubmit="RegisterUser">
+<div class="col-12 row">
+    <input class="form-control col-12" @bind="User.Username" placeholder="Username..." />
+</div>
+<br />
+<div class="col-12 row">
+    <input type="password" class="form-control col-12" @bind="User.Password" placeholder="Password..." />
+</div>
+<br />
+<div class="col-12 row">
+    <span class="col-12"></span>
+    <input type="submit" class="form-control col-6 btn btn-primary" value="Sign up" />
+    <a href="/" class="col-6">Already an user?</a>
+</div>
+<br />
+<div class="col-12 row" style="text-align:left; font-weight:bold">
+    <span class="col-12">@LoginMessage</span>
+</div>
+</EditForm>
+@code {
+
+    private RegisterUserDto User { get; set; } = null!;
+    private string LoginMessage { get; set; } = null!;
+
+    protected override Task OnInitializedAsync()
+    {
+        User = new RegisterUserDto();
+        return base.OnInitializedAsync();
+    }
+    
+    private async Task<bool> RegisterUser()
+    {
+        var success = IdentityRepository.RegisterUser(User);
+
+        await success;
+        
+        if (!success.Result.Item1)
+        {
+            LoginMessage = success.Result.Item2.ToString();
+            return false;
+        }
+        
+        NavigationManager.NavigateTo("/");
+        return await Task.FromResult(true);
+    }
+}

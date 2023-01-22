@@ -14,7 +14,7 @@ public class UserRepository : IUserRepository
         _context = context;
     }
     
-    public async Task Add(CreateUserRequest request)
+    public async Task<(bool, object)>  Add(CreateUserRequest request)
     {
         var user = new User
         {
@@ -26,9 +26,13 @@ public class UserRepository : IUserRepository
         
         user.ProvideSaltAndHash();
         
+        // TODO: Check if user exists, if yes => return false
+        
         await _context.Users.AddAsync(user);
 
         await _context.SaveChangesAsync();
+
+        return (true, user);
     }
 
     public User Get()

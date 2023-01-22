@@ -5,7 +5,7 @@ namespace Identity.Application;
 
 public interface IUserRepository
 {
-    Task Add(CreateUserRequest request);
+    Task<(bool, object)> Add(CreateUserRequest request);
     User Get();
     Task<List<User>> GetAll();
     bool Delete();
