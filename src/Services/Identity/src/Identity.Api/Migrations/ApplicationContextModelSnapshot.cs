@@ -23,7 +23,7 @@ namespace Identity.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Identity.Api.Domain.Models.User", b =>
+            modelBuilder.Entity("Identity.Api.Web.Domain.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

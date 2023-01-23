@@ -19,6 +19,19 @@ builder.Services.AddDbContext<ApplicationContext>(o =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsSpecs",
+        builder =>
+        {
+            builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed(options => true)
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -55,5 +68,7 @@ app.MapPost("/auth", (LoginUserRequest request, [FromServices] ApplicationContex
         Expires = DateTimeOffset.Now.AddDays(7).ToUnixTimeSeconds()
     });
 });
+
+app.UseCors("CorsSpecs");
 
 app.Run();

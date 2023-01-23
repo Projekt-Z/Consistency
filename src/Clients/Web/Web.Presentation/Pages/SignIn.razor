@@ -1,0 +1,63 @@
+﻿@page "/sign-in"
+@using Microsoft.AspNetCore.Components
+@using Domain.DTOs
+@using Web.Application.Identity
+@using Blazored.LocalStorage
+@inject IIdentityRepository IdentityRepository
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+
+<h3>Sign-In</h3>
+
+<EditForm Model="@User" OnValidSubmit="LoginUser">
+    <div class="col-12 row">
+        <input class="form-control col-12" @bind="User.Username" placeholder="Username..." />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input type="password" class="form-control col-12" @bind="User.Password" placeholder="Password..." />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Sign In" />
+        <a href="/sign-up" class="col-6">Dont have an accont? Create one!</a>
+    </div>
+    <br />
+    <div class="col-12 row" style="text-align:left; font-weight:bold">
+        <span class="col-12">@LoginMessage</span>
+    </div>
+</EditForm>
+@code {
+
+    private SignInRequestDto User { get; set; } = null!;
+    private string LoginMessage { get; set; } = null!;
+
+    protected override Task OnInitializedAsync()
+    {
+        User = new SignInRequestDto();
+        return base.OnInitializedAsync();
+    }
+    
+    private async Task<bool> LoginUser()
+    {
+        var result = IdentityRepository.LoginUser(User);
+
+        await result;
+        
+        if (!result.Result.Item1)
+        {
+            LoginMessage = result.Result.Item2.ToString();
+            return false;
+        }
+
+        var token = result.Result.Item2 as SignInResponseDto;
+
+        await LocalStorage.SetItemAsync("token", token.Token);
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        
+        NavigationManager.NavigateTo("/");
+        return await Task.FromResult(true);
+    }
+}
