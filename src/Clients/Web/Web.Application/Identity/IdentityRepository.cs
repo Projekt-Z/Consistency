@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Newtonsoft.Json;
+using Web.Application.Tasks;
 using Web.Domain;
 using Web.Domain.DTOs;
 
@@ -9,10 +11,12 @@ namespace Web.Application.Identity;
 public class IdentityRepository : IIdentityRepository
 {
     private readonly HttpClient _httpClient;
+    private readonly ITasksRepository _tasksRepository;
 
-    public IdentityRepository(HttpClient httpClient)
+    public IdentityRepository(HttpClient httpClient, ITasksRepository tasksRepository)
     {
         _httpClient = httpClient;
+        _tasksRepository = tasksRepository;
     }
 
     public Task<IEnumerable<User>?> GetAllUsers()

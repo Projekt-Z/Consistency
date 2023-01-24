@@ -1,0 +1,63 @@
+﻿@page "/tasks"
+@using Microsoft.AspNetCore.Authorization
+@using Web.Application.Authentication
+@using Web.Application.Tasks
+@using Task = Web.Domain.Task
+@attribute [Authorize]
+
+@inject ILocalStorageService LocalStorage
+@inject ITasksRepository TaskRepository
+
+<PageTitle>Tasks</PageTitle>
+
+<h1>Your current tasks:</h1>
+
+<button class="btn btn-primary" @onclick="AddTask">Add task</button>
+
+<AuthorizeView>
+    <NotAuthorized>
+        Not authorized
+    </NotAuthorized>
+    <Authorized>
+
+        @foreach (var task in OwnedTasks)
+        {
+            <TaskComponent Task="task"/>
+        }
+        
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    public List<Task> OwnedTasks { get; set; } = new();
+
+    protected override async Task<System.Threading.Tasks.Task> OnInitializedAsync()
+    {
+        OwnedTasks = (List<Task>)await GetAll();
+
+        Console.WriteLine(OwnedTasks.Count());
+        
+        return base.OnInitializedAsync();
+    }
+
+    private void AddTask()
+    {
+    }
+
+    private async Task<IEnumerable<Task>> GetAll()
+    {
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
+
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (Guid.TryParse(idClaim!.Value, out var userId))
+        {
+            return await TaskRepository.GetAll(userId) ?? new List<Task>();
+        }
+
+        return new List<Task>();
+    }
+}

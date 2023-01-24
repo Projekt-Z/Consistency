@@ -1,0 +1,12 @@
+﻿@using Task = Web.Domain.Task
+
+<div>
+    <p>@Task.Content</p>
+    Created At: <p>@Task.CreatedAt</p>
+    Last Edited At: <p>@Task.LastEdited</p>
+</div>
+
+@code {
+    [Parameter]
+    public Task Task { get; set; }
+}

@@ -7,15 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsSpecs",
-        builder =>
-        {
-            builder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed(options => true)
-                .AllowCredentials();
-        });
+    options.AddPolicy("CorsPolicy",
+        builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 });
 
 var app = builder.Build();
@@ -47,6 +42,6 @@ app.MapPost("/tasks/{id}", (string id, [FromBody] CreateTaskModelRequest request
     return success.Result ? Results.Ok() : Results.BadRequest();
 });
 
-app.UseCors("CorsSpecs");
+app.UseCors("CorsPolicy");
 
 app.Run();

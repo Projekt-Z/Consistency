@@ -21,15 +21,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsSpecs",
-        builder =>
-        {
-            builder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed(options => true)
-                .AllowCredentials();
-        });
+    options.AddPolicy("CorsPolicy",
+        builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 });
 
 var app = builder.Build();
@@ -68,7 +63,5 @@ app.MapPost("/auth", (LoginUserRequest request, [FromServices] ApplicationContex
         Expires = DateTimeOffset.Now.AddDays(7).ToUnixTimeSeconds()
     });
 });
-
-app.UseCors("CorsSpecs");
 
 app.Run();
