@@ -1,12 +1,32 @@
 ﻿@using Task = Web.Domain.Task
+@using Web.Application.Tasks
+@using Web.Application.Authentication
+@inject ITasksRepository TaskRepository
+@using Blazored.LocalStorage
 
 <div>
     <p>@Task.Content</p>
     Created At: <p>@Task.CreatedAt</p>
     Last Edited At: <p>@Task.LastEdited</p>
+    
+    <button onclick="@Delete">Delete</button>
 </div>
 
 @code {
     [Parameter]
     public Task Task { get; set; }
+
+    private async System.Threading.Tasks.Task Delete()
+    {
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
+
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (Guid.TryParse(idClaim!.Value, out var userId))
+        {
+            await TaskRepository.Delete(Task.Id, userId);
+        }
+    }
 }

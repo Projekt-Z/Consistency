@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Web.Application.Authentication
 @using Web.Application.Tasks
+@using Web.Domain.DTOs.Tasks
 @using Task = Web.Domain.Task
 @attribute [Authorize]
 
@@ -12,7 +13,20 @@
 
 <h1>Your current tasks:</h1>
 
-<button class="btn btn-primary" @onclick="AddTask">Add task</button>
+<EditForm Model="@Task" OnValidSubmit="AddTask">
+    <div class="col-12 row">
+        <input class="form-control col-12" @bind="Task.Content" placeholder="Write here..." />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Add Task" />
+    </div>
+    <br />
+    <div class="col-12 row" style="text-align:left; font-weight:bold">
+        <span class="col-12">@ErorMessage</span>
+    </div>
+</EditForm>
 
 <AuthorizeView>
     <NotAuthorized>
@@ -31,18 +45,38 @@
 @code {
 
     public List<Task> OwnedTasks { get; set; } = new();
+    public AddTaskRequestDto Task { get; set; } = new ();
+    public string ErorMessage { get; set; } = null!;
 
     protected override async Task<System.Threading.Tasks.Task> OnInitializedAsync()
     {
         OwnedTasks = (List<Task>)await GetAll();
 
-        Console.WriteLine(OwnedTasks.Count());
-        
         return base.OnInitializedAsync();
     }
 
-    private void AddTask()
+    private async void AddTask()
     {
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
+
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (!Guid.TryParse(idClaim!.Value, out var userId)) return;
+        
+        var result = await TaskRepository.Add(new AddTaskRequestDto
+        {
+            OwnerId = userId,
+            Content = Task.Content
+        });
+            
+        if (!result.Item1)
+        {
+            ErorMessage = result.Item2.ToString();
+        }
+            
+        NavigationManager.NavigateTo("/tasks");
     }
 
     private async Task<IEnumerable<Task>> GetAll()
