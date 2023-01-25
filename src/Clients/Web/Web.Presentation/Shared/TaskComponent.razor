@@ -4,12 +4,18 @@
 @inject ITasksRepository TaskRepository
 @using Blazored.LocalStorage
 
-<div>
-    <p>@Task.Content</p>
-    Created At: <p>@Task.CreatedAt</p>
-    Last Edited At: <p>@Task.LastEdited</p>
+<div class="w-25 p-2 text-center m-1" style="background: rgb(222,222,222)">
+    <h5 class="fw-bold">@Task.Content</h5>
+    Created At: <p>@DateTime.Parse(Task.CreatedAt).ToString("f")</p>
+    @{
+        if (DateTime.TryParse(Task.LastEdited, out var lastEdited))
+        {
+            <span>Last Edited At: <p>@lastEdited.ToString("f")</p></span>
+        }
+    }
     
-    <button onclick="@Delete">Delete</button>
+    <button onclick="@Delete" class="btn btn-danger">Delete</button>
+    <button class="btn btn-info" @onclick='() => { NavigationManager.NavigateTo($"task/{Task.Id}"); }'>Edit</button>
 </div>
 
 @code {
@@ -28,5 +34,9 @@
         {
             await TaskRepository.Delete(Task.Id, userId);
         }
+        
+        NavigationManager.NavigateTo("/tasks", true);
+        
+        StateHasChanged();
     }
 }

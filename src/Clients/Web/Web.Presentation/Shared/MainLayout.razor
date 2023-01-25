@@ -6,9 +6,19 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="top-row px-4">
+                    <a href="/sign-in">Sign In</a>
+                </div>
+            </NotAuthorized>
+            <Authorized>
+                <div class="top-row px-4">
+                    <DisplayUser></DisplayUser>
+                    <LogoutUser></LogoutUser>
+                </div>
+            </Authorized>
+        </AuthorizeView>
 
         <article class="content px-4">
             @Body

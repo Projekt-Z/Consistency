@@ -34,17 +34,26 @@
     </NotAuthorized>
     <Authorized>
 
-        @foreach (var task in OwnedTasks)
-        {
-            <TaskComponent Task="task"/>
-        }
+        <div class="d-flex w-100 flex-row flex-wrap">
+            @if (OwnedTasks is null)
+            {
+                <span>Loading...</span>
+            }
+            else
+            {
+                foreach (var task in OwnedTasks!)
+                {
+                    <TaskComponent Task="task"/>
+                }
+            }
+        </div>
         
     </Authorized>
 </AuthorizeView>
 
 @code {
 
-    public List<Task> OwnedTasks { get; set; } = new();
+    public List<Task>? OwnedTasks { get; set; }
     public AddTaskRequestDto Task { get; set; } = new ();
     public string ErorMessage { get; set; } = null!;
 
@@ -75,8 +84,12 @@
         {
             ErorMessage = result.Item2.ToString();
         }
-            
-        NavigationManager.NavigateTo("/tasks");
+
+        await InvokeAsync(StateHasChanged);
+        
+        NavigationManager.NavigateTo("/tasks", true);
+        
+        OwnedTasks = (List<Task>?)await GetAll();
     }
 
     private async Task<IEnumerable<Task>> GetAll()

@@ -48,6 +48,37 @@ public class TasksRepository : ITasksRepository
         return (false, content.ToString());
     }
 
+    public async Task<(bool, object)> Edit(AddTaskRequestDto requestDto, string taskId)
+    {
+        var json = JsonConvert.SerializeObject(requestDto);
+
+        object? content;
+        
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress + $"tasks/{taskId}");
+        requestMessage.Content = new StringContent(json);
+
+        requestMessage.Content.Headers.ContentType
+            = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+        var response = await _httpClient.SendAsync(requestMessage);
+        
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            //content = JsonConvert.DeserializeObject<User>(responseBody);
+            return (true, string.Empty);
+        }
+
+        content = JsonConvert.DeserializeObject<MessageResponseDto>(responseBody);
+        return (false, content.ToString());
+    }
+
+    public Task<Task?> Get(string id)
+    {
+        return _httpClient.GetFromJsonAsync<Task>(_httpClient.BaseAddress + $"tasks/{id}");
+    }
+
     public async Task<(bool, object)> Delete(string taskId, Guid ownerId)
     {
         var requestDto = new DeleteTaskModelRequest

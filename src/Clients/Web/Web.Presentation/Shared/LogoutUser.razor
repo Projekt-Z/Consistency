@@ -1,0 +1,14 @@
+﻿<a @onclick="Logout" class="text-primary pe-auto">Logout</a>
+
+@code {
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("token");
+        await LocalStorage.RemoveItemAsync("username");
+        
+        StateHasChanged();
+        
+        NavigationManager.NavigateTo("/sign-in", true);
+    }
+}

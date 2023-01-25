@@ -1,4 +1,5 @@
-﻿
+﻿@using Web.Application.Helpers
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -17,3 +18,21 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+
+    protected override async void OnInitialized()
+    {
+        var jwt = await LocalStorage.GetItemAsStringAsync("token");
+        
+        if (!string.IsNullOrEmpty(jwt))
+        {
+            jwt = jwt.Replace("\"", string.Empty);
+            
+            Console.WriteLine(jwt.ValidateJwt());
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
+}

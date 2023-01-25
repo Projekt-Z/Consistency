@@ -1,0 +1,78 @@
+﻿@page "/task/{id}"
+@using Microsoft.AspNetCore.Authorization
+@using Web.Application.Authentication
+@using Web.Application.Tasks
+@using Web.Domain.DTOs.Tasks
+@attribute [Authorize]
+
+@inject ITasksRepository TaskRepository
+
+@if (Task is null)
+{
+    <span class="text-center">Loading...</span>
+}
+else
+{
+    <div class="w-100 p-2">
+        <EditForm Model="@TaskRequest" OnValidSubmit="Edit">
+            <div class="d-flex justify-content-center align-self-center align-content-center">
+                <textarea cols="100" @bind="TaskRequest.Content">
+                    @Task.Content
+                </textarea>
+            </div>
+            <div class="d-flex justify-content-center align-self-center align-content-center mt-2">
+                <input type="submit" class="btn btn-info" value="Edit">
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = null!;
+
+    private AddTaskRequestDto TaskRequest { get; set; } = new();
+
+    private Domain.Task? Task { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var jwt = await LocalStorage.GetItemAsStringAsync("token");
+        
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(jwt);
+        
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (!Guid.TryParse(idClaim!.Value, out var userId)) return;
+
+        var task = await TaskRepository.Get(Id);
+
+        if (task?.OwnerId != userId)
+        {
+            NavigationManager.NavigateTo("/tasks");
+        }
+
+        Task = task;
+        
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Edit()
+    {
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
+
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (!Guid.TryParse(idClaim!.Value, out var userId)) return;
+
+        await TaskRepository.Edit(new AddTaskRequestDto
+        {
+            Content = TaskRequest.Content,
+            OwnerId = userId
+        }, Id);
+
+        StateHasChanged();
+    }
+}

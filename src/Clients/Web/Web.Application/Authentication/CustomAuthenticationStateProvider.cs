@@ -29,6 +29,9 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
             identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token.Replace("\"", ""));
+            var username = ParseClaimsFromJwt(token).FirstOrDefault(x => x.Type == "username")?.Value;
+
+            await _localStorage.SetItemAsStringAsync("username", username);
         }
 
         var user = new ClaimsPrincipal(identity);
