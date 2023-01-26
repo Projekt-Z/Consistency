@@ -44,7 +44,7 @@ app.MapPut("/tasks", (CreateTaskModelRequest request) =>
 }).RequireAuthorization();;
 
 app.MapDelete("/tasks/{id}", (string id, [FromBody] DeleteTaskModelRequest request) => taskService.Delete(id, request.OwnerId)).RequireAuthorization();
-app.MapPost("/tasks/{id}", (string id, [FromBody] CreateTaskModelRequest request) =>
+app.MapPost("/tasks/{id}", (string id, [FromBody] EditTaskModelRequest request) =>
 {
     var success = taskService.Update(id, request);
 

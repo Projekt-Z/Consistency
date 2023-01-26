@@ -40,15 +40,18 @@ public class TasksRepository : ITasksRepository
 
         if (response.StatusCode == HttpStatusCode.Created)
         {
-            //content = JsonConvert.DeserializeObject<User>(responseBody);
-            return (true, string.Empty);
+            content = JsonConvert.DeserializeObject<Task>(responseBody);
+
+            var task = content as Task;
+            
+            return (true, task.Id);
         }
 
         content = JsonConvert.DeserializeObject<MessageResponseDto>(responseBody);
         return (false, content.ToString());
     }
 
-    public async Task<(bool, object)> Edit(AddTaskRequestDto requestDto, string taskId)
+    public async Task<(bool, object)> Edit(EditTaskModelRequest requestDto, string taskId)
     {
         var json = JsonConvert.SerializeObject(requestDto);
 

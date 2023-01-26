@@ -1,24 +1,31 @@
 ﻿@page "/task/{id}"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
 @using Web.Application.Authentication
 @using Web.Application.Tasks
-@using Web.Domain.DTOs.Tasks
+@using global::Tasks.Domain
 @attribute [Authorize]
 
 @inject ITasksRepository TaskRepository
 
 @if (Task is null)
 {
-    <span class="text-center">Loading...</span>
+    <Loading></Loading>
 }
 else
 {
+    <div>
+        <a href="/tasks">Back to tasks</a>
+    </div>
     <div class="w-100 p-2">
         <EditForm Model="@TaskRequest" OnValidSubmit="Edit">
             <div class="d-flex justify-content-center align-self-center align-content-center">
                 <textarea cols="100" @bind="TaskRequest.Content">
                     @Task.Content
                 </textarea>
+            </div>
+            <div class="d-flex justify-content-center align-self-center align-content-center">
+                <span>Finished? </span> 
             </div>
             <div class="d-flex justify-content-center align-self-center align-content-center mt-2">
                 <input type="submit" class="btn btn-info" value="Edit">
@@ -31,7 +38,7 @@ else
     [Parameter]
     public string Id { get; set; } = null!;
 
-    private AddTaskRequestDto TaskRequest { get; set; } = new();
+    private EditTaskModelRequest TaskRequest { get; set; } = new();
 
     private Domain.Task? Task { get; set; }
 
@@ -67,10 +74,11 @@ else
 
         if (!Guid.TryParse(idClaim!.Value, out var userId)) return;
 
-        await TaskRepository.Edit(new AddTaskRequestDto
+        await TaskRepository.Edit(new EditTaskModelRequest
         {
-            Content = TaskRequest.Content,
-            OwnerId = userId
+            Content = TaskRequest.Content ??= Task!.Content,
+            OwnerId = userId,
+            Finished = TaskRequest.Finished
         }, Id);
 
         StateHasChanged();

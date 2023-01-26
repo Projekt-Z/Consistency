@@ -10,23 +10,26 @@
 @inject ITasksRepository TaskRepository
 
 <PageTitle>Tasks</PageTitle>
+<div class="w-100 d-flex justify-content-center align-content-center align-items-center">
+    <div class="w-50">
+        <h1>Your current tasks:</h1>
 
-<h1>Your current tasks:</h1>
-
-<EditForm Model="@Task" OnValidSubmit="AddTask">
-    <div class="col-12 row">
-        <input class="form-control col-12" @bind="Task.Content" placeholder="Write here..." />
+        <EditForm Model="@Task" OnValidSubmit="AddTask">
+            <div class="col-12 row">
+                <input class="form-control col-12" @bind="Task.Content" placeholder="Write here..."/>
+            </div>
+            <br/>
+            <div class="col-12 row">
+                <span class="col-12"></span>
+                <input type="submit" class="form-control col-6 btn btn-primary" value="Add Task"/>
+            </div>
+            <br/>
+            <div class="col-12 row" style="text-align:left; font-weight:bold">
+                <span class="col-12">@ErorMessage</span>
+            </div>
+        </EditForm>
     </div>
-    <br />
-    <div class="col-12 row">
-        <span class="col-12"></span>
-        <input type="submit" class="form-control col-6 btn btn-primary" value="Add Task" />
-    </div>
-    <br />
-    <div class="col-12 row" style="text-align:left; font-weight:bold">
-        <span class="col-12">@ErorMessage</span>
-    </div>
-</EditForm>
+</div>
 
 <AuthorizeView>
     <NotAuthorized>
@@ -37,7 +40,7 @@
         <div class="d-flex w-100 flex-row flex-wrap">
             @if (OwnedTasks is null)
             {
-                <span>Loading...</span>
+                <Loading></Loading>
             }
             else
             {
@@ -87,7 +90,7 @@
 
         await InvokeAsync(StateHasChanged);
         
-        NavigationManager.NavigateTo("/tasks", true);
+        NavigationManager.NavigateTo($"/task/{result.Item2}");
         
         OwnedTasks = (List<Task>?)await GetAll();
     }

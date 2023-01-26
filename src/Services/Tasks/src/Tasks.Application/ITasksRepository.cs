@@ -9,5 +9,5 @@ public interface ITasksRepository
     Task<List<TaskModel>> GetAll();
     Task<List<TaskModel>> GetAllForUser(Guid ownerId);
     Task<bool> Delete(string taskId, Guid ownerId);
-    Task<bool> Update(string taskId, CreateTaskModelRequest request);
+    Task<bool> Update(string taskId, EditTaskModelRequest request);
 }

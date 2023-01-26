@@ -5,12 +5,21 @@
 @using Blazored.LocalStorage
 
 <div class="w-25 p-2 text-center m-1" style="background: rgb(222,222,222)">
-    <h5 class="fw-bold">@Task.Content</h5>
-    Created At: <p>@DateTime.Parse(Task.CreatedAt).ToString("f")</p>
+    @if (Task.Content.Length > 35)
+    {
+        <h5 class="fw-bold">@(Task.Content[..32])...</h5>
+    }
+    else
+    {
+        <h5 class="fw-bold">@Task.Content</h5>
+    }
+    Created At:
+    <p>@DateTime.Parse(Task.CreatedAt).ToString("f")</p>
     @{
         if (DateTime.TryParse(Task.LastEdited, out var lastEdited))
         {
-            <span>Last Edited At: <p>@lastEdited.ToString("f")</p></span>
+            <span>Last Edited At:
+                <p>@lastEdited.ToString("f")</p></span>
         }
     }
     

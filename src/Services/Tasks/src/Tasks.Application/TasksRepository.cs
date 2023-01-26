@@ -59,7 +59,7 @@ public class TasksRepository : ITasksRepository
         return true;
     }
 
-    public async Task<bool> Update(string taskId, CreateTaskModelRequest request)
+    public async Task<bool> Update(string taskId, EditTaskModelRequest request)
     {
         var definition = Builders<TaskModel>.Filter.Eq(x => x.Id, taskId);
         var task = _tasks.Find(definition).SingleOrDefaultAsync();
@@ -73,7 +73,7 @@ public class TasksRepository : ITasksRepository
             Id = taskId,
             Content = request.Content,
             CreatedAt = task.Result.CreatedAt,
-            Finished = task.Result.Finished,
+            Finished = request.Finished,
             LastEdited = DateTime.Now,
             OwnerId = request.OwnerId
         });
