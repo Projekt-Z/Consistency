@@ -5,4 +5,9 @@ public class EditTaskModelRequest
     public Guid OwnerId { get; set; }
     public string Content { get; set; } = null!;
     public bool Finished { get; set; }
+
+    public override string ToString()
+    {
+        return $"{OwnerId} - {Content} - {Finished}";
+    }
 }

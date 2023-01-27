@@ -3,6 +3,7 @@
 @using Web.Application.Authentication
 @inject ITasksRepository TaskRepository
 @using Blazored.LocalStorage
+@using Tasks.Domain
 
 <div class="w-25 p-2 text-center m-1" style="background: rgb(222,222,222)">
     @if (Task.Content.Length > 35)
@@ -18,18 +19,31 @@
     @{
         if (DateTime.TryParse(Task.LastEdited, out var lastEdited))
         {
-            <span>Last Edited At:
-                <p>@lastEdited.ToString("f")</p></span>
+            <span>
+                Last Edited At:
+                <p>@lastEdited.ToString("f")</p>
+            </span>
         }
     }
-    
+
+    <button @onclick="ChangeFinished" class="btn @ButtonClassStyle">@MapBoolIntoFinishedText(Task.Finished)</button>
+
     <button onclick="@Delete" class="btn btn-danger">Delete</button>
     <button class="btn btn-info" @onclick='() => { NavigationManager.NavigateTo($"task/{Task.Id}"); }'>Edit</button>
 </div>
 
 @code {
+
     [Parameter]
     public Task Task { get; set; }
+
+    private string ButtonClassStyle { get; set; } = null!;
+
+    protected override System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        MapBoolIntoFinishedText(Task.Finished);
+        return base.OnInitializedAsync();
+    }
 
     private async System.Threading.Tasks.Task Delete()
     {
@@ -43,9 +57,42 @@
         {
             await TaskRepository.Delete(Task.Id, userId);
         }
-        
+
         NavigationManager.NavigateTo("/tasks", true);
-        
+
         StateHasChanged();
     }
+
+    private string MapBoolIntoFinishedText(bool finish)
+    {
+        if (finish)
+        {
+            ButtonClassStyle = "btn-success";
+            return "Finished";
+        }
+        
+        ButtonClassStyle = "btn-secondary";
+        return "Not Finished";
+    }
+
+    private async System.Threading.Tasks.Task ChangeFinished()
+    {
+        Task.Finished = !Task.Finished;
+
+        var token = await LocalStorage.GetItemAsStringAsync("token");
+
+        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
+
+        var idClaim = claims.FirstOrDefault(x => x.Type == "id");
+
+        if (!Guid.TryParse(idClaim!.Value, out var userId)) return;
+
+        await TaskRepository.Edit(new EditTaskModelRequest
+        {
+            Content = Task.Content,
+            OwnerId = userId,
+            Finished = Task.Finished
+        }, Task.Id);
+    }
+
 }

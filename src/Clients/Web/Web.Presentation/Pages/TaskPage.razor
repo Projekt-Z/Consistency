@@ -25,7 +25,7 @@ else
                 </textarea>
             </div>
             <div class="d-flex justify-content-center align-self-center align-content-center">
-                <span>Finished? </span> 
+                <button @onclick="ChangeFinished" class="btn @ButtonClassStyle">@MapBoolIntoFinishedText(Task.Finished)</button>
             </div>
             <div class="d-flex justify-content-center align-self-center align-content-center mt-2">
                 <input type="submit" class="btn btn-info" value="Edit">
@@ -41,7 +41,8 @@ else
     private EditTaskModelRequest TaskRequest { get; set; } = new();
 
     private Domain.Task? Task { get; set; }
-
+    private string ButtonClassStyle { get; set; } = null!;
+    
     protected override async Task OnInitializedAsync()
     {
         var jwt = await LocalStorage.GetItemAsStringAsync("token");
@@ -63,7 +64,24 @@ else
         
         await base.OnInitializedAsync();
     }
+    
+    private string MapBoolIntoFinishedText(bool finish)
+    {
+        if (finish)
+        {
+            ButtonClassStyle = "btn-success";
+            return "Finished";
+        }
+        
+        ButtonClassStyle = "btn-secondary";
+        return "Not Finished";
+    }
 
+    private void ChangeFinished()
+    {
+        Task!.Finished = !Task.Finished;
+    }
+    
     private async Task Edit()
     {
         var token = await LocalStorage.GetItemAsStringAsync("token");
@@ -78,7 +96,7 @@ else
         {
             Content = TaskRequest.Content ??= Task!.Content,
             OwnerId = userId,
-            Finished = TaskRequest.Finished
+            Finished = Task!.Finished
         }, Id);
 
         StateHasChanged();
