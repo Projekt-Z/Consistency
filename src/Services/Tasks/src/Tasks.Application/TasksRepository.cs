@@ -75,7 +75,8 @@ public class TasksRepository : ITasksRepository
             CreatedAt = task.Result.CreatedAt,
             Finished = request.Finished,
             LastEdited = DateTime.Now,
-            OwnerId = request.OwnerId
+            OwnerId = request.OwnerId,
+            Deadline = request.Deadline
         });
         
         return true;

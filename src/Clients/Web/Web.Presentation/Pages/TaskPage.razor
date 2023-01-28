@@ -24,13 +24,24 @@ else
                     @Task.Content
                 </textarea>
             </div>
-            <div class="d-flex justify-content-center align-self-center align-content-center">
-                <button @onclick="ChangeFinished" class="btn @ButtonClassStyle">@MapBoolIntoFinishedText(Task.Finished)</button>
+            <div class="d-flex justify-content-around w-100 align-items-center align-content-around">
+                <div class="w-25">
+                    <button @onclick="ChangeFinished" class="btn @ButtonClassStyle">@MapBoolIntoFinishedText(Task.Finished)</button>
+                </div>
+                <div class="w-25">
+                    Set your Task DeadLine <input type="date" @bind="TaskRequest.Deadline"/>
+                </div>
+                @if (Task.Deadline is not null)
+                {
+                    <div class="w-25">Current DeadLine: @Task.Deadline</div>
+                }
+
             </div>
             <div class="d-flex justify-content-center align-self-center align-content-center mt-2">
                 <input type="submit" class="btn btn-info" value="Edit">
             </div>
         </EditForm>
+        <p class="text-danger text-center">@Message</p>
     </div>
 }
 
@@ -42,6 +53,7 @@ else
 
     private Domain.Task? Task { get; set; }
     private string ButtonClassStyle { get; set; } = null!;
+    private string Message { get; set; } = null!;
     
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +73,8 @@ else
         }
 
         Task = task;
+
+        MapBoolIntoFinishedText(Task!.Finished);
         
         await base.OnInitializedAsync();
     }
@@ -86,6 +100,8 @@ else
     {
         var token = await LocalStorage.GetItemAsStringAsync("token");
 
+        Console.WriteLine(TaskRequest.Deadline);
+        
         var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(token);
 
         var idClaim = claims.FirstOrDefault(x => x.Type == "id");
@@ -96,9 +112,11 @@ else
         {
             Content = TaskRequest.Content ??= Task!.Content,
             OwnerId = userId,
-            Finished = Task!.Finished
+            Finished = Task!.Finished,
+            Deadline = TaskRequest.Deadline ??= Task.Deadline
         }, Id);
 
-        StateHasChanged();
+        Message = "Task was changed.";
+        Task.Deadline = TaskRequest.Deadline ?? Task.Deadline;
     }
 }

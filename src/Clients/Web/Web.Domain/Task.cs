@@ -7,5 +7,8 @@ public class Task
     public string CreatedAt { get; set; }
     public string? LastEdited { get; set; } = null;
     public bool Finished { get; set; }
+    public DateTime? Deadline { get; set; }
+    public bool Repeating { get; set; }
+    public List<int>? Days { get; set; }
     public Guid OwnerId { get; set; }
 }
